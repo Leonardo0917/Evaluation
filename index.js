@@ -17,10 +17,10 @@ const View = (() => {
         arr.forEach(element => {
             let type = element.required ? "Compulsory" : "Elective"; 
             tmp +=`
-                <li class="course">
-                    <span>${element.courseName}</span>
-                    <span>Course Type: ${type}</span>
-                    <span>Course Credit: <span class="cc">${element.credit}</span></span>
+                <li>
+                    <span  class="course">${element.courseName}</br>
+                    Course Type: ${type}</br>
+                    Course Credit: <span class="cc">${element.credit}</span></span>
                 </li>
             `;
         });
@@ -90,6 +90,7 @@ const Controller = ((model, view) => {
         const courses = document.querySelector(view.domstr.available);
         courses.addEventListener('click', (event) => {
             // There is an issue with if-statement, some li doesn't respnd when clicked
+            console.log(event.target)
             if (event.target.className === "course") {
                 let cc = parseInt(event.target.querySelector(".cc").innerHTML);
 
