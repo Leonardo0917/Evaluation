@@ -23,6 +23,10 @@ html, body {
     align-items: center;
 }
 
+.submit {
+    text-align: center;
+}
+
 .coursesContainer {
     height: 400px;
     width: 300px;
