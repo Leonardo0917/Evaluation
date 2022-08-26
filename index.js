@@ -84,18 +84,21 @@ const Model = ((api, view) => {
 // ---Controller---
 const Controller = ((model, view) => {
     const state = new model.State();
+    const maxCredits = 18;
 
     const selectCourse = () => {
         const courses = document.querySelector(view.domstr.available);
-        courses.addEventListener('click', (event)=> {
-            console.log(event.target);
-            if (event.currentTarget.className === "course") {
-                let c = parseInt(event.target.querySelector(".cc").innerHTML);
-                console.log(c);
-                if (state.totalCredits + c > 18) {
+        courses.addEventListener('click', (event) => {
+            // There is an issue with if-statement, some li doesn't respnd when clicked
+            if (event.target.className === "course") {
+                let cc = parseInt(event.target.querySelector(".cc").innerHTML);
+
+                if (state.totalCredits + cc > maxCredits) {
                     alert("You can only choose up to 18 credits in one semester");
                 } else {
-                    state.totalCredits = state.totalCredits + c;
+                    state.totalCredits = state.totalCredits + cc;
+                    // update the selected li background-color
+                    
                 }
             }
         })
