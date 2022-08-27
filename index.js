@@ -5,6 +5,7 @@ const View = (() => {
     const domstr = {
         courses: ".courses",
         available: "#available",
+        selected: "#selected",
         credits: ".credits",
         sumbit: "#submit"
     }
@@ -44,6 +45,7 @@ const Model = ((api, view) => {
 
     class State {
         #coursesList = [];
+        #selectingList = [];
         #selectedList = [];
         #totalCredits = 0;
 
@@ -59,12 +61,44 @@ const Model = ((api, view) => {
             view.render(courseContainer, tagContent);
         }
 
+        get selectingList() {
+            return this.#selectingList;
+        }
+
+        set selectingList(newselectingList) {
+            this.#selectingList = [...newselectingList];
+        }
+
         get selectedList() {
             return this.#selectedList;
         }
 
-        set selectedList(newselectedList) {
-            this.#selectedList = [...newselectedList];
+        set selectedList(newSelectedList) {
+            let new_CourseList = [];
+            let new_SelectedList = [];
+            this.#coursesList.map(e => {
+                let found = false;
+                for (let i = 0; i < this.selectingList.length; i++) {
+                    if (e.courseName === this.selectingList[i].name) {
+                        new_SelectedList.push(e);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) new_CourseList.push(e);
+            });
+            console.log(new_CourseList)
+            this.#coursesList = new_CourseList;
+            this.#selectingList = [];
+            this.#selectedList = new_SelectedList;
+            // render selected course
+            const selectedContainer = document.querySelector(view.domstr.selected);
+            const selectedTagContent = view.createLists(this.#selectedList);
+            view.render(selectedContainer, selectedTagContent);
+            // render available course
+            const courseContainer = document.querySelector(view.domstr.courses);
+            const tagContent = view.createLists(this.#coursesList);
+            view.render(courseContainer, tagContent);
         }
 
         get totalCredits () {
@@ -119,8 +153,8 @@ const Controller = ((model, view) => {
             let cn = target.querySelector(".cn").innerHTML;
             
             // unmark <li>
-            if (state.selectedList.some(e => e.name === cn)) {
-                state.selectedList = state.selectedList.filter(e => e.name !== cn);
+            if (state.selectingList.some(e => e.name === cn)) {
+                state.selectingList = state.selectingList.filter(e => e.name !== cn);
                 state.totalCredits = state.totalCredits - cc;
             } 
             // mark <li>
@@ -130,7 +164,7 @@ const Controller = ((model, view) => {
                     alert("You can only choose up to 18 credits in one semester");
                 } else {
                     const selected_course = new model.SelectedCourse(cn);
-                    state.selectedList = [selected_course, ...state.selectedList];
+                    state.selectingList = [selected_course, ...state.selectingList];
                     state.totalCredits = state.totalCredits + cc;
                 }
             }
@@ -141,8 +175,8 @@ const Controller = ((model, view) => {
             // render bgcolor
             const _course = document.querySelectorAll(".cn");
             _course.forEach(e => {
-                for (let i = 0; i < state.selectedList.length; i++) {
-                    if (e.innerHTML === state.selectedList[i].name) {
+                for (let i = 0; i < state.selectingList.length; i++) {
+                    if (e.innerHTML === state.selectingList[i].name) {
                         e.parentElement.style.backgroundColor = selectedColor;
                         break;
                     }
@@ -156,7 +190,8 @@ const Controller = ((model, view) => {
         sumbitBtn.addEventListener("click", (event) => {
             let msg = "You have chosen " + state.totalCredits + " credits for this semester. You cannot change once you submit. Do you want to confirm?"
             if(confirm(msg)) {
-                
+                sumbitBtn.disabled = true;
+                state.selectedList = state.selectingList;
             }
         });
     }
