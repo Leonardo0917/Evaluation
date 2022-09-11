@@ -56,7 +56,7 @@ const Model = ((api, view) => {
         set coursesList(newCoursesList) {
             this.#coursesList = [...newCoursesList];
 
-            const courseContainer = document.querySelector(view.domstr.courses);
+            const courseContainer = document.querySelector(view.domstr.available);
             const tagContent = view.createLists(this.#coursesList);
             view.render(courseContainer, tagContent);
         }
@@ -87,16 +87,16 @@ const Model = ((api, view) => {
                 }
                 if (!found) new_CourseList.push(e);
             });
-            console.log(new_CourseList)
             this.#coursesList = new_CourseList;
             this.#selectingList = [];
             this.#selectedList = new_SelectedList;
+            
             // render selected course
             const selectedContainer = document.querySelector(view.domstr.selected);
             const selectedTagContent = view.createLists(this.#selectedList);
             view.render(selectedContainer, selectedTagContent);
             // render available course
-            const courseContainer = document.querySelector(view.domstr.courses);
+            const courseContainer = document.querySelector(view.domstr.available);
             const tagContent = view.createLists(this.#coursesList);
             view.render(courseContainer, tagContent);
         }
@@ -169,7 +169,7 @@ const Controller = ((model, view) => {
                 }
             }
             // refresh
-            const courseContainer = document.querySelector(view.domstr.courses);
+            const courseContainer = document.querySelector(view.domstr.available);
             const tagContent = view.createLists(state.coursesList);
             view.render(courseContainer, tagContent);
             // render bgcolor
@@ -183,6 +183,24 @@ const Controller = ((model, view) => {
                 }
             })
         }, true);
+    }
+
+    const filterCourse = () => {
+        const _filter = document.querySelector(".courseCredit_filter");
+        _filter.addEventListener("keyup", (event) => {
+            if (event.target.value.trim()) {
+                let _num = event.target.value;
+                let creditList = state.coursesList.filter( e => e.credit == _num);
+
+                const courseContainer = document.querySelector(view.domstr.available);
+                const tagContent = view.createLists(creditList);
+                view.render(courseContainer, tagContent);
+            } else {
+                const courseContainer = document.querySelector(view.domstr.available);
+                const tagContent = view.createLists(state.coursesList);
+                view.render(courseContainer, tagContent);
+            }
+        });
     }
 
     const sumbit = () => {
@@ -199,6 +217,7 @@ const Controller = ((model, view) => {
     const bootstramp = () => {
         init();
         selectCourse();
+        filterCourse();
         sumbit();
     };
 
